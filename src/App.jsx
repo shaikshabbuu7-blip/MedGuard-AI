@@ -26,17 +26,13 @@ useEffect(() => {
       const response = await analyzePatient(patientData);
 
       // Convert Gemini response to JSON
-      const data = JSON.parse(
-        response.replace(/```json|```/g, "").trim()
-      );
+     setResult(response);
 
-      setResult(data);
-
-      // Save patient to Firestore
-      await addDoc(collection(db, "patients"), {
-        ...data,
-        createdAt: new Date().toISOString(),
-      });
+await addDoc(collection(db, "patients"), {
+  result: response,
+  patient: patientData,
+  createdAt: new Date().toISOString(),
+});
 
       alert("Patient analyzed and saved successfully!");
     } catch (error) {
@@ -78,19 +74,15 @@ if (loading) {
             Screen Patient
           </button>
 
-          {result && (
-            <div className="result">
-              <h2>Extracted Details</h2>
+         {result && (
+  <div className="result">
+    <h2>AI Analysis</h2>
 
-              <p><strong>Name:</strong> {result.name}</p>
-              <p><strong>Age:</strong> {result.age}</p>
-              <p><strong>Symptoms:</strong> {result.symptoms?.join(", ")}</p>
-              <p><strong>Allergies:</strong> {result.allergies?.join(", ")}</p>
-              <p><strong>Blood Pressure:</strong> {result.bloodPressure}</p>
-              <p><strong>Medications:</strong> {result.medications?.join(", ")}</p>
-              <p><strong>Risk Level:</strong> {result.riskLevel}</p>
-            </div>
-          )}
+    <div style={{ whiteSpace: "pre-wrap" }}>
+      {result}
+    </div>
+  </div>
+)}
         </div>
       }
     />
